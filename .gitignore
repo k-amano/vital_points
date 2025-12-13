@@ -63,6 +63,7 @@ yarn-error.log*
 *.backup
 .cache/
 .claude/
+*_original.png
 
 # OS
 Thumbs.db

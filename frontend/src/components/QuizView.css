@@ -135,9 +135,19 @@
 }
 
 .correct-answer-text {
-  margin: 0;
+  margin: 0 0 1rem 0;
   font-size: 1rem;
   color: #721c24;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.feedback-buttons button {
+  flex: 1;
 }
 
 .completion-card {

@@ -48,16 +48,22 @@ function QuizView({ sessionId, onComplete, onPause }) {
       })
 
       setFeedback(response.data)
-
-      if (response.data.is_correct) {
-        // 正解なら1秒後に次の問題へ
-        setTimeout(() => {
-          loadQuestion()
-        }, 1500)
-      }
     } catch (error) {
       console.error('回答の送信に失敗しました', error)
       alert('回答の送信に失敗しました')
+    }
+  }
+
+  const handleNextQuestion = () => {
+    loadQuestion()
+  }
+
+  const handleEndSession = async () => {
+    try {
+      await quizSessionAPI.complete(sessionId)
+      onComplete()
+    } catch (error) {
+      console.error('セッションの終了に失敗しました', error)
     }
   }
 
@@ -149,6 +155,14 @@ function QuizView({ sessionId, onComplete, onPause }) {
                 正解: {feedback.correct_answer}
               </p>
             )}
+            <div className="feedback-buttons">
+              <button className="btn btn-primary" onClick={handleNextQuestion}>
+                次の問題へ
+              </button>
+              <button className="btn btn-secondary" onClick={handleEndSession}>
+                学習を終える
+              </button>
+            </div>
           </div>
         )}
       </div>
