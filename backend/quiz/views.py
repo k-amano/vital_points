@@ -59,9 +59,29 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
         # 新しいセッションを作成
         session = QuizSession.objects.create()
 
-        # 全急所をランダム順で取得
-        all_vital_points = list(VitalPoint.objects.all())
-        random.shuffle(all_vital_points)
+        # 不正解が多い順モードかどうかを確認
+        weak_points_mode = request.data.get('weak_points_mode', False)
+
+        if weak_points_mode:
+            # 不正解が多い順に取得（学習履歴がない場合はランダム）
+            histories = LearningHistory.objects.select_related('vital_point').filter(
+                incorrect_count__gt=0
+            ).order_by('-incorrect_count')
+
+            # 不正解のある急所を優先的に配置
+            weak_points = [h.vital_point for h in histories]
+
+            # まだ学習していない、または不正解が0の急所を取得
+            weak_point_ids = [vp.id for vp in weak_points]
+            remaining_points = list(VitalPoint.objects.exclude(id__in=weak_point_ids))
+            random.shuffle(remaining_points)
+
+            # 不正解が多い順 + 残りをランダム順で結合
+            all_vital_points = weak_points + remaining_points
+        else:
+            # 全急所をランダム順で取得
+            all_vital_points = list(VitalPoint.objects.all())
+            random.shuffle(all_vital_points)
 
         # セッション問題を作成
         for order, vital_point in enumerate(all_vital_points, start=1):
@@ -89,7 +109,8 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
 
         # 選択肢を生成（正解 + ランダムな不正解3つ）
         correct_answer = current_question.vital_point
-        other_points = list(VitalPoint.objects.exclude(id=correct_answer.id))
+        # 正解のIDと名前が同じものを除外（重複する名前がある場合に対応）
+        other_points = list(VitalPoint.objects.exclude(id=correct_answer.id).exclude(name=correct_answer.name))
         random.shuffle(other_points)
         wrong_answers = other_points[:3]
 

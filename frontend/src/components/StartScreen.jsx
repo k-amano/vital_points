@@ -1,7 +1,7 @@
 import React from 'react'
 import './StartScreen.css'
 
-function StartScreen({ statistics, onStart, onViewStatistics }) {
+function StartScreen({ statistics, onStart, onStartWeakPoints, onViewStatistics }) {
   return (
     <div className="start-screen">
       <div className="welcome-card">
@@ -32,6 +32,11 @@ function StartScreen({ statistics, onStart, onViewStatistics }) {
           <button className="btn btn-primary btn-large" onClick={onStart}>
             新しいセッションを開始
           </button>
+          {statistics && statistics.total_incorrect > 0 && (
+            <button className="btn btn-warning btn-large" onClick={onStartWeakPoints}>
+              苦手な問題から開始
+            </button>
+          )}
           <button className="btn btn-secondary" onClick={onViewStatistics}>
             詳細な統計を見る
           </button>

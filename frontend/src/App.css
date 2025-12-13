@@ -56,6 +56,11 @@
   color: #333;
 }
 
+.btn-warning {
+  background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+  color: white;
+}
+
 .btn-large {
   padding: 1rem 2rem;
   font-size: 1.2rem;

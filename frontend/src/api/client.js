@@ -21,7 +21,7 @@ export const learningHistoryAPI = {
 };
 
 export const quizSessionAPI = {
-  startNew: () => client.post('/quiz-sessions/start_new_session/'),
+  startNew: (weakPointsMode = false) => client.post('/quiz-sessions/start_new_session/', { weak_points_mode: weakPointsMode }),
   getCurrentQuestion: (sessionId) => client.get(`/quiz-sessions/${sessionId}/current_question/`),
   submitAnswer: (sessionId, data) => client.post(`/quiz-sessions/${sessionId}/submit_answer/`, data),
   pause: (sessionId) => client.post(`/quiz-sessions/${sessionId}/pause/`),
