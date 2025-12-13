@@ -116,10 +116,6 @@ function QuizView({ sessionId, onComplete, onPause }) {
           この急所「{question.number}」の名前は？
         </div>
 
-        <div className="question-image">
-          <img src={imageUrl} alt="急所の図" />
-        </div>
-
         <div className="choices">
           {question.choices.map((choice, index) => {
             const isSelected = selectedAnswer === choice.name
@@ -147,6 +143,10 @@ function QuizView({ sessionId, onComplete, onPause }) {
               </button>
             )
           })}
+        </div>
+
+        <div className="question-image">
+          <img src={imageUrl} alt="急所の図" />
         </div>
 
         {feedback && (
