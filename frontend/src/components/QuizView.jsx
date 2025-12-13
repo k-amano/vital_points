@@ -112,11 +112,12 @@ function QuizView({ sessionId, onComplete, onPause }) {
       </div>
 
       <div className="question-card">
+        <div className="question-label">
+          この急所「{question.number}」の名前は？
+        </div>
+
         <div className="question-image">
           <img src={imageUrl} alt="急所の図" />
-          <div className="question-label">
-            この急所「{question.number}」の名前は？
-          </div>
         </div>
 
         <div className="choices">
@@ -141,7 +142,8 @@ function QuizView({ sessionId, onComplete, onPause }) {
                 onClick={() => handleAnswerSelect(choice)}
                 disabled={feedback !== null}
               >
-                {choice.name}
+                <span className="choice-name">{choice.name}</span>
+                <span className="choice-reading">（{choice.reading}）</span>
               </button>
             )
           })}

@@ -101,7 +101,7 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
             'question_order': current_question.question_order,
             'image_file': correct_answer.image_file,
             'number': correct_answer.number,
-            'choices': [{'id': vp.id, 'name': vp.name} for vp in choices],
+            'choices': [{'id': vp.id, 'name': vp.name, 'reading': vp.reading} for vp in choices],
             'total_questions': session.questions.count(),
             'answered_count': session.questions.filter(is_answered=True).count()
         })
