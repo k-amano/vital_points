@@ -14,6 +14,13 @@ function App() {
     loadStatistics()
   }, [])
 
+  // viewが'start'に変わったときに統計を再読み込み
+  useEffect(() => {
+    if (view === 'start') {
+      loadStatistics()
+    }
+  }, [view])
+
   const loadStatistics = async () => {
     try {
       const response = await learningHistoryAPI.getStatistics()

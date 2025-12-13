@@ -24,8 +24,10 @@ class LearningHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def statistics(self, request):
         """統計情報を取得"""
-        total_correct = sum(h.correct_count for h in self.queryset)
-        total_incorrect = sum(h.incorrect_count for h in self.queryset)
+        # get_queryset()を使って最新のデータを取得
+        histories = self.get_queryset()
+        total_correct = sum(h.correct_count for h in histories)
+        total_incorrect = sum(h.incorrect_count for h in histories)
         total_attempts = total_correct + total_incorrect
 
         return Response({
@@ -38,7 +40,7 @@ class LearningHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def weak_points(self, request):
         """苦手な急所を取得（不正解が多い順）"""
-        weak_histories = self.queryset.filter(
+        weak_histories = self.get_queryset().filter(
             incorrect_count__gt=0
         ).order_by('-incorrect_count')[:10]
 
