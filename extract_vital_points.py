@@ -10,7 +10,7 @@ import json
 vital_points_data = {
     "Scan2025-12-13_140703_000.png": {
         "category": "頭部・頸部・顔面の急所",
-        "count": 25,
+        "count": 24,
         "points": [
             {"number": "①", "name": "百会", "reading": "ひゃくえ"},
             {"number": "②", "name": "四合", "reading": "しごう"},
@@ -36,7 +36,6 @@ vital_points_data = {
             {"number": "㉒", "name": "気舎", "reading": "きしゃ"},
             {"number": "㉓", "name": "缺盆", "reading": "けつぼん"},
             {"number": "㉔", "name": "天窓", "reading": "てんそう"},
-            {"number": "㉕", "name": "天容", "reading": "てんよう"},
         ]
     },
     "Scan2025-12-13_140703_001.png": {

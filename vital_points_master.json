@@ -1,7 +1,7 @@
 {
   "Scan2025-12-13_140703_000.png": {
     "category": "頭部・頸部・顔面の急所",
-    "count": 25,
+    "count": 24,
     "points": [
       {
         "number": "①",
@@ -122,11 +122,6 @@
         "number": "㉔",
         "name": "天窓",
         "reading": "てんそう"
-      },
-      {
-        "number": "㉕",
-        "name": "天容",
-        "reading": "てんよう"
       }
     ]
   },
