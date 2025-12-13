@@ -12,22 +12,30 @@ class Command(BaseCommand):
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        VitalPoint.objects.all().delete()
-        self.stdout.write('既存のデータを削除しました')
+        # 学習履歴を保持するため、削除せずに更新または作成を行う
+        updated_count = 0
+        created_count = 0
 
-        count = 0
         for image_name, image_data in data.items():
             category = image_data['category']
             for point in image_data['points']:
-                VitalPoint.objects.create(
+                # image_file、number、nameの組み合わせで既存データを検索
+                vital_point, created = VitalPoint.objects.update_or_create(
+                    image_file=image_name,
                     number=point['number'],
                     name=point['name'],
-                    reading=point['reading'],
-                    category=category,
-                    image_file=image_name
+                    defaults={
+                        'reading': point['reading'],
+                        'category': category,
+                    }
                 )
-                count += 1
+                if created:
+                    created_count += 1
+                else:
+                    updated_count += 1
 
         self.stdout.write(
-            self.style.SUCCESS(f'{count}件の急所データを登録しました')
+            self.style.SUCCESS(
+                f'急所データを登録しました（新規: {created_count}件, 更新: {updated_count}件）'
+            )
         )
