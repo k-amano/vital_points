@@ -1,7 +1,6 @@
 {
   "Scan2025-12-13_140703_000.png": {
-    "category": "頭部・頸部・顔面の急所",
-    "count": 24,
+    "category": "",
     "points": [
       {
         "number": "①",
@@ -10,129 +9,118 @@
       },
       {
         "number": "②",
-        "name": "四合",
-        "reading": "しごう"
-      },
-      {
-        "number": "③",
-        "name": "天柱",
-        "reading": "てんちゅう"
-      },
-      {
-        "number": "④",
-        "name": "顋会",
+        "name": "顖会",
         "reading": "しんえ"
       },
       {
+        "number": "③",
+        "name": "日月",
+        "reading": "にちげつじ"
+      },
+      {
+        "number": "④",
+        "name": "三角",
+        "reading": "さんかく"
+      },
+      {
         "number": "⑤",
+        "name": "人中",
+        "reading": "じんちゅう"
+      },
+      {
+        "number": "⑥",
+        "name": "承漿",
+        "reading": "しょうしょう"
+      },
+      {
+        "number": "⑦",
+        "name": "両眼",
+        "reading": "りょうがん"
+      },
+      {
+        "number": "⑧",
+        "name": "顴髎",
+        "reading": "けんりょう"
+      },
+      {
+        "number": "⑨",
+        "name": "四合",
+        "reading": "よんごう"
+      },
+      {
+        "number": "⑩",
         "name": "三合",
         "reading": "さんごう"
       },
       {
-        "number": "⑥",
-        "name": "巓谷",
-        "reading": "いんこく"
-      },
-      {
-        "number": "⑦",
-        "name": "耳門",
-        "reading": "じもん"
-      },
-      {
-        "number": "⑧",
-        "name": "蝶谷",
-        "reading": "ちょうこく"
-      },
-      {
-        "number": "⑨",
-        "name": "顋脈",
-        "reading": "けいみゃく"
-      },
-      {
-        "number": "⑩",
-        "name": "人迎",
-        "reading": "じんげい"
-      },
-      {
         "number": "⑪",
-        "name": "風府",
-        "reading": "ふうふ"
+        "name": "三日月",
+        "reading": "みかづき"
       },
       {
         "number": "⑫",
-        "name": "胸鎖",
-        "reading": "きょうさ"
+        "name": "風鈴",
+        "reading": "ふうりん"
       },
       {
         "number": "⑬",
-        "name": "闕門",
-        "reading": "けつもん"
+        "name": "両耳",
+        "reading": "りょうじ"
       },
       {
         "number": "⑭",
-        "name": "竜尾",
-        "reading": "りゅうび"
-      },
-      {
-        "number": "⑮",
-        "name": "顋月",
-        "reading": "あごつき"
-      },
-      {
-        "number": "⑯",
         "name": "脳戸",
         "reading": "のうこ"
       },
       {
-        "number": "⑰",
-        "name": "嗇囲",
-        "reading": "まのつぼ"
-      },
-      {
-        "number": "⑱",
+        "number": "⑮",
         "name": "唖門",
         "reading": "あもん"
       },
       {
-        "number": "⑲",
-        "name": "哮音",
-        "reading": "けいおん"
-      },
-      {
-        "number": "⑳",
-        "name": "顋中",
+        "number": "⑯",
+        "name": "頸中",
         "reading": "けいちゅう"
       },
       {
+        "number": "⑰",
+        "name": "天柱",
+        "reading": "てんちゅう"
+      },
+      {
+        "number": "⑱",
+        "name": "脛骨",
+        "reading": "けいこつ"
+      },
+      {
+        "number": "⑲",
+        "name": "独鈷",
+        "reading": "どっこ"
+      },
+      {
+        "number": "⑳",
+        "name": "仏骨",
+        "reading": "ぶっこつ"
+      },
+      {
         "number": "㉑",
-        "name": "顋扶",
-        "reading": "けいふ"
+        "name": "頸脉",
+        "reading": "けいみゃく"
       },
       {
         "number": "㉒",
-        "name": "気舎",
-        "reading": "きしゃ"
-      },
-      {
-        "number": "㉓",
-        "name": "缺盆",
-        "reading": "けつぼん"
-      },
-      {
-        "number": "㉔",
-        "name": "天窓",
-        "reading": "てんそう"
+        "name": "松風",
+        "reading": "まつかぜ"
       }
     ]
   },
   "Scan2025-12-13_140703_001.png": {
-    "category": "上肢（手足）の急所",
-    "count": 15,
+    "category": "",
     "points": [
       {
         "number": "①",
-        "name": "肩髃",
-        "reading": "けんぐう"
+        "name": "青霊",
+        "reading": "せいれい"
       },
       {
         "number": "②",
@@ -156,8 +144,8 @@
       },
       {
         "number": "⑥",
-        "name": "心包",
-        "reading": "しんぽう"
+        "name": "神門",
+        "reading": "しんもん"
       },
       {
         "number": "⑦",
@@ -166,8 +154,8 @@
       },
       {
         "number": "①",
-        "name": "巨骨",
-        "reading": "ここつ"
+        "name": "五里",
+        "reading": "ごり"
       },
       {
         "number": "②",
@@ -176,23 +164,23 @@
       },
       {
         "number": "③",
-        "name": "天井",
-        "reading": "てんせい"
+        "name": "三里",
+        "reading": "さんり"
       },
       {
         "number": "④",
-        "name": "曲池",
-        "reading": "きょくち"
+        "name": "陽谿",
+        "reading": "ようけい"
       },
       {
         "number": "⑤",
-        "name": "頭谷",
-        "reading": "ずこく"
+        "name": "陽谷",
+        "reading": "ようこく"
       },
       {
         "number": "⑥",
-        "name": "谷谷",
-        "reading": "こくこく"
+        "name": "合谷",
+        "reading": "ごうこく"
       },
       {
         "number": "⑦",
@@ -207,8 +195,7 @@
     ]
   },
   "Scan2025-12-13_140703_002.png": {
-    "category": "胴部の急所",
-    "count": 11,
+    "category": "",
     "points": [
       {
         "number": "①",
@@ -217,59 +204,63 @@
       },
       {
         "number": "②",
-        "name": "気舎",
-        "reading": "きしゃ"
-      },
-      {
-        "number": "③",
-        "name": "三鎖",
-        "reading": "さんさ"
-      },
-      {
-        "number": "④",
-        "name": "巨闕",
+        "name": "膻中",
         "reading": "だんちゅう"
       },
       {
-        "number": "⑤",
-        "name": "金的",
-        "reading": "きんてき"
+        "number": "③",
+        "name": "胸尖",
+        "reading": "きょうせん"
       },
       {
-        "number": "⑥",
-        "name": "上脘",
-        "reading": "じょうかん"
-      },
-      {
-        "number": "⑦",
-        "name": "膺宮",
-        "reading": "ようきゅう"
-      },
-      {
-        "number": "⑧",
-        "name": "鷺尾",
-        "reading": "けいび"
-      },
-      {
-        "number": "⑨",
-        "name": "建里",
-        "reading": "けんり"
-      },
-      {
-        "number": "⑩",
+        "number": "④",
         "name": "水月",
         "reading": "すいげつ"
       },
       {
+        "number": "⑤",
+        "name": "気海",
+        "reading": "きかい"
+      },
+      {
+        "number": "⑥",
+        "name": "金的",
+        "reading": "きんてき"
+      },
+      {
+        "number": "⑦",
+        "name": "霊墟",
+        "reading": "れいきょ"
+      },
+      {
+        "number": "⑧",
+        "name": "雁下",
+        "reading": "がんか"
+      },
+      {
+        "number": "⑨",
+        "name": "三枚",
+        "reading": "さんまい"
+      },
+      {
+        "number": "⑩",
+        "name": "横三枚",
+        "reading": "よこさんまい"
+      },
+      {
         "number": "⑪",
-        "name": "膺陵",
-        "reading": "ようりょう"
+        "name": "胸陰",
+        "reading": "きょういん"
+      },
+      {
+        "number": "⑫",
+        "name": "気舎",
+        "reading": "きしゃ"
       }
     ]
   },
   "Scan2025-12-13_140703_003.png": {
-    "category": "急所名（漢字・よみがな）",
-    "count": 12,
+    "category": "",
     "points": [
       {
         "number": "①",
@@ -328,14 +319,13 @@
       },
       {
         "number": "⑫",
-        "name": "陥谷",
-        "reading": "かんこく"
+        "name": "臨泣",
+        "reading": "りんきゅう"
       }
     ]
   },
   "Scan2025-12-13_140703_004.png": {
-    "category": "急所名（漢字・よみがな）",
-    "count": 9,
+    "category": "",
     "points": [
       {
         "number": "⑬",
