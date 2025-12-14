@@ -65,5 +65,9 @@ yarn-error.log*
 .claude/
 *_original.png
 
+# Server management
+.pids/
+logs/
+
 # OS
 Thumbs.db
