@@ -61,7 +61,7 @@ function App() {
         {view === 'start' && (
           <StartScreen
             statistics={statistics}
-            onStart={startNewSession}
+            onStart={() => startNewSession()}
             onStartWeakPoints={startWeakPointsSession}
             onViewStatistics={() => setView('statistics')}
           />
