@@ -30,19 +30,27 @@ function App() {
     }
   }
 
-  const startNewSession = async (weakPointsMode = false) => {
+  const startNewSession = async (mode = 'test') => {
     try {
-      const response = await quizSessionAPI.startNew(weakPointsMode)
+      const response = await quizSessionAPI.startNew(mode)
       setSessionId(response.data.id)
       setView('quiz')
     } catch (error) {
       console.error('セッションの開始に失敗しました', error)
-      alert('セッションの開始に失敗しました')
+      if (error.response?.data?.message) {
+        alert(error.response.data.message)
+      } else {
+        alert('セッションの開始に失敗しました')
+      }
     }
   }
 
-  const startWeakPointsSession = async () => {
-    await startNewSession(true)
+  const startTestSession = async () => {
+    await startNewSession('test')
+  }
+
+  const startReviewSession = async () => {
+    await startNewSession('review')
   }
 
   const handleQuizComplete = () => {
@@ -61,8 +69,8 @@ function App() {
         {view === 'start' && (
           <StartScreen
             statistics={statistics}
-            onStart={() => startNewSession()}
-            onStartWeakPoints={startWeakPointsSession}
+            onStartTest={startTestSession}
+            onStartReview={startReviewSession}
             onViewStatistics={() => setView('statistics')}
           />
         )}

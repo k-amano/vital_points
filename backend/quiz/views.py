@@ -3,10 +3,11 @@ from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import VitalPoint, LearningHistory, QuizSession, SessionQuestion
+from .models import VitalPoint, LearningHistory, QuizSession, SessionQuestion, TestResult
 from .serializers import (
     VitalPointSerializer, LearningHistorySerializer,
-    QuizSessionSerializer, QuizSessionSummarySerializer, AnswerSubmitSerializer
+    QuizSessionSerializer, QuizSessionSummarySerializer,
+    TestResultSerializer, AnswerSubmitSerializer
 )
 
 
@@ -23,11 +24,11 @@ class LearningHistoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def statistics(self, request):
-        """統計情報を取得"""
-        # get_queryset()を使って最新のデータを取得
-        histories = self.get_queryset()
-        total_correct = sum(h.correct_count for h in histories)
-        total_incorrect = sum(h.incorrect_count for h in histories)
+        """統計情報を取得（テスト結果のみ）"""
+        # テスト結果から集計
+        test_results = TestResult.objects.all()
+        total_correct = sum(r.correct_count for r in test_results)
+        total_incorrect = sum(r.incorrect_count for r in test_results)
         total_attempts = total_correct + total_incorrect
 
         return Response({
@@ -39,12 +40,28 @@ class LearningHistoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def weak_points(self, request):
-        """苦手な急所を取得（不正解が多い順）"""
-        weak_histories = self.get_queryset().filter(
+        """苦手な急所を取得（不正解率が高い順、上位10件）"""
+        histories = list(self.get_queryset().filter(
             incorrect_count__gt=0
-        ).order_by('-incorrect_count')[:10]
+        ))
+
+        # 不正解率でソート
+        histories.sort(
+            key=lambda h: h.incorrect_count / (h.correct_count + h.incorrect_count),
+            reverse=True
+        )
+
+        # 上位10件
+        weak_histories = histories[:10]
 
         serializer = self.get_serializer(weak_histories, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def test_results(self, request):
+        """テスト結果一覧（最新10件）"""
+        results = TestResult.objects.all().order_by('-completed_at')[:10]
+        serializer = TestResultSerializer(results, many=True)
         return Response(serializer.data)
 
 
@@ -56,42 +73,49 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def start_new_session(self, request):
         """新規セッションを開始"""
+        # モードを取得（test または review）
+        mode = request.data.get('mode', 'test')
+
         # 新しいセッションを作成
-        session = QuizSession.objects.create()
+        session = QuizSession.objects.create(mode=mode)
 
-        # 不正解が多い順モードかどうかを確認
-        weak_points_mode = request.data.get('weak_points_mode', False)
-
-        if weak_points_mode:
-            # 不正解が多い順に取得（学習履歴がない場合はランダム）
-            histories = LearningHistory.objects.select_related('vital_point').filter(
+        if mode == 'review':
+            # 復習モード: 不正解率が高い順に25題
+            histories = list(LearningHistory.objects.select_related('vital_point').filter(
                 incorrect_count__gt=0
-            ).order_by('-incorrect_count')
+            ))
 
-            # 不正解のある急所を優先的に配置
-            weak_points = [h.vital_point for h in histories]
+            # 不正解率でソート（降順）
+            histories.sort(
+                key=lambda h: h.incorrect_count / (h.correct_count + h.incorrect_count),
+                reverse=True
+            )
 
-            # まだ学習していない、または不正解が0の急所を取得
-            weak_point_ids = [vp.id for vp in weak_points]
-            remaining_points = list(VitalPoint.objects.exclude(id__in=weak_point_ids))
-            random.shuffle(remaining_points)
+            # 不正解率が高い順に最大25題
+            selected_points = [h.vital_point for h in histories[:25]]
 
-            # 不正解が多い順 + 残りをランダム順で結合
-            all_vital_points = weak_points + remaining_points
+            # 不正解のある問題が25題未満の場合は終了
+            if len(selected_points) == 0:
+                session.delete()
+                return Response(
+                    {'message': '復習する問題がありません'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         else:
-            # 全急所をランダム順で取得
+            # テストモード: ランダムに25題
             all_vital_points = list(VitalPoint.objects.all())
             random.shuffle(all_vital_points)
+            selected_points = all_vital_points[:25]
 
-        # セッション問題を作成
-        for order, vital_point in enumerate(all_vital_points, start=1):
+        # セッション問題を作成（25題）
+        for order, vital_point in enumerate(selected_points, start=1):
             SessionQuestion.objects.create(
                 session=session,
                 vital_point=vital_point,
                 question_order=order
             )
 
-        # 軽量版のシリアライザーを使用（全質問データを含まない）
+        # 軽量版のシリアライザーを使用
         serializer = QuizSessionSummarySerializer(session)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -152,42 +176,29 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
         # 試行回数を増やす
         question.attempt_count += 1
 
+        # 回答を記録（正解・不正解に関わらず完了扱い）
+        question.is_answered = True
+        question.is_correct = is_correct
+        question.save()
+
+        # 学習履歴を更新
+        history, created = LearningHistory.objects.get_or_create(
+            vital_point=question.vital_point
+        )
+
         if is_correct:
-            # 正解の場合
-            question.is_answered = True
-            question.is_correct = True
-            question.save()
-
-            # 学習履歴を更新
-            history, created = LearningHistory.objects.get_or_create(
-                vital_point=question.vital_point
-            )
             history.correct_count += 1
-            history.last_learned_at = timezone.now()
-            history.save()
-
-            return Response({
-                'is_correct': True,
-                'message': '正解です！',
-                'correct_answer': correct_answer
-            })
         else:
-            # 不正解の場合
-            question.save()
-
-            # 学習履歴を更新
-            history, created = LearningHistory.objects.get_or_create(
-                vital_point=question.vital_point
-            )
             history.incorrect_count += 1
-            history.last_learned_at = timezone.now()
-            history.save()
 
-            return Response({
-                'is_correct': False,
-                'message': '不正解です。もう一度挑戦してください。',
-                'correct_answer': correct_answer
-            })
+        history.last_learned_at = timezone.now()
+        history.save()
+
+        return Response({
+            'is_correct': is_correct,
+            'message': '正解です！' if is_correct else f'不正解です。正解は「{correct_answer}」です。',
+            'correct_answer': correct_answer
+        })
 
     @action(detail=True, methods=['post'])
     def pause(self, request, pk=None):
@@ -212,4 +223,20 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
         session.status = 'completed'
         session.completed_at = timezone.now()
         session.save()
+
+        # テストモードの場合、TestResultを作成
+        if session.mode == 'test':
+            total_questions = session.questions.count()
+            correct_count = session.questions.filter(is_correct=True).count()
+            incorrect_count = total_questions - correct_count
+            score = int((correct_count / total_questions) * 100) if total_questions > 0 else 0
+
+            TestResult.objects.create(
+                session=session,
+                total_questions=total_questions,
+                correct_count=correct_count,
+                incorrect_count=incorrect_count,
+                score=score
+            )
+
         return Response({'message': 'セッションが完了しました'})

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import VitalPoint, LearningHistory, QuizSession, SessionQuestion
+from .models import VitalPoint, LearningHistory, QuizSession, SessionQuestion, TestResult
 
 
 class VitalPointSerializer(serializers.ModelSerializer):
@@ -40,8 +40,16 @@ class QuizSessionSummarySerializer(serializers.ModelSerializer):
     """セッション作成時など、質問データを含まない軽量版"""
     class Meta:
         model = QuizSession
-        fields = ['id', 'status', 'started_at', 'completed_at',
+        fields = ['id', 'status', 'mode', 'started_at', 'completed_at',
                   'current_question_index']
+
+
+class TestResultSerializer(serializers.ModelSerializer):
+    """テスト結果のシリアライザー"""
+    class Meta:
+        model = TestResult
+        fields = ['id', 'completed_at', 'total_questions', 'correct_count',
+                  'incorrect_count', 'score']
 
 
 class AnswerSubmitSerializer(serializers.Serializer):

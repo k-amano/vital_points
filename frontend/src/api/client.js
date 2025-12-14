@@ -18,10 +18,11 @@ export const learningHistoryAPI = {
   getAll: () => client.get('/learning-history/'),
   getStatistics: () => client.get('/learning-history/statistics/'),
   getWeakPoints: () => client.get('/learning-history/weak_points/'),
+  getTestResults: () => client.get('/learning-history/test_results/'),
 };
 
 export const quizSessionAPI = {
-  startNew: (weakPointsMode = false) => client.post('/quiz-sessions/start_new_session/', { weak_points_mode: weakPointsMode }),
+  startNew: (mode = 'test') => client.post('/quiz-sessions/start_new_session/', { mode }),
   getCurrentQuestion: (sessionId) => client.get(`/quiz-sessions/${sessionId}/current_question/`),
   submitAnswer: (sessionId, data) => client.post(`/quiz-sessions/${sessionId}/submit_answer/`, data),
   pause: (sessionId) => client.post(`/quiz-sessions/${sessionId}/pause/`),
