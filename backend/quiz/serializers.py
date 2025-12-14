@@ -36,6 +36,14 @@ class QuizSessionSerializer(serializers.ModelSerializer):
                   'current_question_index', 'questions']
 
 
+class QuizSessionSummarySerializer(serializers.ModelSerializer):
+    """セッション作成時など、質問データを含まない軽量版"""
+    class Meta:
+        model = QuizSession
+        fields = ['id', 'status', 'started_at', 'completed_at',
+                  'current_question_index']
+
+
 class AnswerSubmitSerializer(serializers.Serializer):
     """回答送信用シリアライザー"""
     session_id = serializers.IntegerField()

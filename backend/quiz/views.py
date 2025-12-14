@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from .models import VitalPoint, LearningHistory, QuizSession, SessionQuestion
 from .serializers import (
     VitalPointSerializer, LearningHistorySerializer,
-    QuizSessionSerializer, AnswerSubmitSerializer
+    QuizSessionSerializer, QuizSessionSummarySerializer, AnswerSubmitSerializer
 )
 
 
@@ -91,7 +91,8 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
                 question_order=order
             )
 
-        serializer = self.get_serializer(session)
+        # 軽量版のシリアライザーを使用（全質問データを含まない）
+        serializer = QuizSessionSummarySerializer(session)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['get'])
