@@ -91,10 +91,10 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
                 reverse=True
             )
 
-            # 不正解率が高い順に最大25題
-            selected_points = [h.vital_point for h in histories[:25]]
+            # 不正解率が高い順に最大10題
+            selected_points = [h.vital_point for h in histories[:10]]
 
-            # 不正解のある問題が25題未満の場合は終了
+            # 不正解のある問題がない場合は終了
             if len(selected_points) == 0:
                 session.delete()
                 return Response(
@@ -107,7 +107,7 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
             random.shuffle(all_vital_points)
             selected_points = all_vital_points[:25]
 
-        # セッション問題を作成（25題）
+        # セッション問題を作成（テスト: 25題、復習: 10題）
         for order, vital_point in enumerate(selected_points, start=1):
             SessionQuestion.objects.create(
                 session=session,
@@ -224,13 +224,14 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
         session.completed_at = timezone.now()
         session.save()
 
+        # 結果を計算
+        total_questions = session.questions.count()
+        correct_count = session.questions.filter(is_correct=True).count()
+        incorrect_count = total_questions - correct_count
+        score = int((correct_count / total_questions) * 100) if total_questions > 0 else 0
+
         # テストモードの場合、TestResultを作成
         if session.mode == 'test':
-            total_questions = session.questions.count()
-            correct_count = session.questions.filter(is_correct=True).count()
-            incorrect_count = total_questions - correct_count
-            score = int((correct_count / total_questions) * 100) if total_questions > 0 else 0
-
             TestResult.objects.create(
                 session=session,
                 total_questions=total_questions,
@@ -239,4 +240,11 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
                 score=score
             )
 
-        return Response({'message': 'セッションが完了しました'})
+        return Response({
+            'message': 'セッションが完了しました',
+            'mode': session.mode,
+            'total_questions': total_questions,
+            'correct_count': correct_count,
+            'incorrect_count': incorrect_count,
+            'score': score
+        })

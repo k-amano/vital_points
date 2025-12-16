@@ -8,10 +8,45 @@ function QuizView({ sessionId, onComplete, onPause }) {
   const [feedback, setFeedback] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [result, setResult] = useState(null)
 
   useEffect(() => {
     loadQuestion()
   }, [sessionId])
+
+  const getCompletionMessage = (score, mode) => {
+    if (score === 100) {
+      return {
+        title: '素晴らしい！',
+        message: '完璧です！全問正解おめでとうございます！'
+      }
+    } else if (score >= 90) {
+      return {
+        title: '優秀です！',
+        message: 'ほぼ完璧ですね。素晴らしい成績です！'
+      }
+    } else if (score >= 80) {
+      return {
+        title: 'よくできました！',
+        message: '高得点です！この調子で続けましょう。'
+      }
+    } else if (score >= 70) {
+      return {
+        title: '合格です！',
+        message: '合格ラインに達しました。順調に学習が進んでいます。'
+      }
+    } else if (score >= 60) {
+      return {
+        title: 'もう少しです',
+        message: 'あと少しで合格です。復習を続けましょう。'
+      }
+    } else {
+      return {
+        title: 'だめです',
+        message: '復習モードで苦手な問題を集中的に学習しましょう。'
+      }
+    }
+  }
 
   const loadQuestion = async () => {
     setLoading(true)
@@ -22,8 +57,9 @@ function QuizView({ sessionId, onComplete, onPause }) {
       const response = await quizSessionAPI.getCurrentQuestion(sessionId)
 
       if (response.data.message === '全ての問題に回答済みです') {
+        const completeResponse = await quizSessionAPI.complete(sessionId)
+        setResult(completeResponse.data)
         setIsCompleted(true)
-        await quizSessionAPI.complete(sessionId)
       } else {
         setQuestion(response.data)
       }
@@ -80,12 +116,34 @@ function QuizView({ sessionId, onComplete, onPause }) {
     return <div className="quiz-view loading">読み込み中...</div>
   }
 
-  if (isCompleted) {
+  if (isCompleted && result) {
+    const completionMsg = getCompletionMessage(result.score, result.mode)
+    const modeText = result.mode === 'test' ? 'テスト' : '復習'
+
     return (
       <div className="quiz-view completed">
         <div className="completion-card">
-          <h2>おめでとうございます！</h2>
-          <p>全ての問題に回答しました</p>
+          <h2>{completionMsg.title}</h2>
+          <p className="completion-message">{completionMsg.message}</p>
+
+          <div className="result-summary">
+            <h3>{modeText}結果</h3>
+            <div className="result-stats">
+              <div className="result-item">
+                <span className="result-label">正解数</span>
+                <span className="result-value correct">{result.correct_count} / {result.total_questions}</span>
+              </div>
+              <div className="result-item">
+                <span className="result-label">不正解数</span>
+                <span className="result-value incorrect">{result.incorrect_count}</span>
+              </div>
+              <div className="result-item score">
+                <span className="result-label">スコア</span>
+                <span className="result-value">{result.score}点</span>
+              </div>
+            </div>
+          </div>
+
           <button className="btn btn-primary" onClick={onComplete}>
             ホームに戻る
           </button>
