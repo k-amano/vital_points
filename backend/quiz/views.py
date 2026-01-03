@@ -80,7 +80,25 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
         session = QuizSession.objects.create(mode=mode)
 
         if mode == 'review':
-            # 復習モード: 不正解率が高い順に25題
+            # 復習モード: ハイブリッド方式（最近間違えた5題 + 不正解率が高い5題）
+
+            # 1. 最近間違えた問題を取得（完了済みセッションから）
+            recent_wrong_questions = SessionQuestion.objects.filter(
+                session__status='completed',
+                is_correct=False
+            ).select_related('vital_point', 'session').order_by('-session__completed_at')
+
+            # 重複を避けてvital_pointを収集（最近間違えた順）
+            recent_wrong_points = []
+            seen_ids = set()
+            for q in recent_wrong_questions:
+                if q.vital_point.id not in seen_ids:
+                    recent_wrong_points.append(q.vital_point)
+                    seen_ids.add(q.vital_point.id)
+                    if len(recent_wrong_points) == 5:
+                        break
+
+            # 2. 不正解率が高い問題を取得
             histories = list(LearningHistory.objects.select_related('vital_point').filter(
                 incorrect_count__gt=0
             ))
@@ -91,21 +109,68 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
                 reverse=True
             )
 
-            # 不正解率が高い順に最大10題
-            selected_points = [h.vital_point for h in histories[:10]]
+            # 最近間違えた問題と重複しないように不正解率が高い問題を追加
+            high_error_points = []
+            for h in histories:
+                if h.vital_point.id not in seen_ids:
+                    high_error_points.append(h.vital_point)
+                    seen_ids.add(h.vital_point.id)
+                    if len(high_error_points) == 5:
+                        break
 
-            # 不正解のある問題がない場合は終了
+            # 3. 合計10題になるように組み合わせる
+            selected_points = recent_wrong_points + high_error_points
+
+            # 足りない場合は不正解率が高い順から追加
+            if len(selected_points) < 10:
+                for h in histories:
+                    if h.vital_point.id not in seen_ids:
+                        selected_points.append(h.vital_point)
+                        seen_ids.add(h.vital_point.id)
+                        if len(selected_points) == 10:
+                            break
+
+            # 復習する問題がない場合は終了
             if len(selected_points) == 0:
                 session.delete()
                 return Response(
                     {'message': '復習する問題がありません'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+
+            # シャッフルして出題順をランダムに
+            random.shuffle(selected_points)
         else:
-            # テストモード: ランダムに25題
+            # テストモード: 重み付けランダム選択（学習回数が少ないほど選ばれやすい）
             all_vital_points = list(VitalPoint.objects.all())
-            random.shuffle(all_vital_points)
-            selected_points = all_vital_points[:25]
+
+            # 各急所の学習回数を取得
+            learning_counts = {}
+            for history in LearningHistory.objects.all():
+                total_count = history.correct_count + history.incorrect_count
+                learning_counts[history.vital_point.id] = total_count
+
+            # 重みを計算: 1 / (学習回数 + 1)
+            weights = []
+            for point in all_vital_points:
+                count = learning_counts.get(point.id, 0)
+                weight = 1.0 / (count + 1)
+                weights.append(weight)
+
+            # 重み付けランダム選択で25題を選ぶ（重複なし）
+            selected_points = []
+            available_points = all_vital_points.copy()
+            available_weights = weights.copy()
+
+            for _ in range(min(25, len(available_points))):
+                # 重み付けで1つ選択
+                chosen = random.choices(available_points, weights=available_weights, k=1)[0]
+                selected_points.append(chosen)
+
+                # 選択した問題を候補から除外
+                index = available_points.index(chosen)
+                available_points.pop(index)
+                available_weights.pop(index)
 
         # セッション問題を作成（テスト: 25題、復習: 10題）
         for order, vital_point in enumerate(selected_points, start=1):
@@ -134,10 +199,19 @@ class QuizSessionViewSet(viewsets.ModelViewSet):
 
         # 選択肢を生成（正解 + ランダムな不正解3つ）
         correct_answer = current_question.vital_point
-        # 正解のIDと名前が同じものを除外（重複する名前がある場合に対応）
-        other_points = list(VitalPoint.objects.exclude(id=correct_answer.id).exclude(name=correct_answer.name))
+        # 正解以外の急所を取得
+        other_points = list(VitalPoint.objects.exclude(id=correct_answer.id))
         random.shuffle(other_points)
-        wrong_answers = other_points[:3]
+
+        # 名前が重複しない不正解を3つ選ぶ
+        wrong_answers = []
+        used_names = {correct_answer.name}
+        for point in other_points:
+            if point.name not in used_names:
+                wrong_answers.append(point)
+                used_names.add(point.name)
+                if len(wrong_answers) == 3:
+                    break
 
         choices = [correct_answer] + wrong_answers
         random.shuffle(choices)
